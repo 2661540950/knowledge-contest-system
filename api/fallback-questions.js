@@ -1,4 +1,7 @@
-{
+/**
+ * file:// 离线回退题库（由 tools/import-question-bank.mjs 从 data/questions.json 生成，请勿手改）
+ */
+window.QUIZ_FALLBACK_DATA = {
   "title": "第十届法治合规暨廉洁文化知识竞赛题库",
   "company": "航空工业复材",
   "generatedAt": "2026-09-20",
@@ -1423,4 +1426,4 @@
       "source": "简答题 源题号 30"
     }
   ]
-}
+};
