@@ -41,8 +41,16 @@
                             <span class="stat-label">多选题</span>
                         </div>
                         <div class="stat-item">
+                            <span class="stat-number" id="judgeCount">-</span>
+                            <span class="stat-label">判断/填空/简答</span>
+                        </div>
+                        <div class="stat-item">
                             <span class="stat-number" id="wrongCount">-</span>
                             <span class="stat-label">错题本</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="maxScoreStat">-</span>
+                            <span class="stat-label">满分</span>
                         </div>
                     </div>
 
@@ -57,7 +65,7 @@
                             <div class="mode-card" data-mode="exam">
                                 <div class="mode-icon">📝</div>
                                 <h4>考试模式</h4>
-                                <p>限时答题，交卷后统一显示成绩</p>
+                                <p>逐题作答并实时判分，答完统一查看成绩</p>
                             </div>
                             <div class="mode-card" data-mode="random">
                                 <div class="mode-icon">🎲</div>
@@ -71,6 +79,8 @@
                             </div>
                         </div>
                     </div>
+
+                    <p class="flow-hint">答题规则：单选题 / 判断题点选即判分，答对后 1 秒自动进入下一题；答错或跳过后需手动点「下一题」。</p>
 
                     <button id="startBtn" class="btn-primary" disabled>
                         开始答题
@@ -115,7 +125,7 @@
                     <button id="submitBtn" class="btn-primary">提交答案</button>
                     <button id="skipBtn" class="btn-secondary">跳过</button>
                     <button id="nextBtn" class="btn-secondary" style="display: none;">下一题</button>
-                    <button id="addToWrongBtn" class="btn-warning" style="display: none;">加入错题本</button>
+                    <button id="finishBtn" class="btn-primary" style="display: none;">交卷</button>
                 </div>
             </section>
 
@@ -130,6 +140,7 @@
                             <span id="finalScore">0</span>
                             <span class="score-label">分</span>
                         </div>
+                        <p class="score-max">满分 <span id="finalMaxScore">0</span> 分</p>
                     </div>
 
                     <div class="result-stats">

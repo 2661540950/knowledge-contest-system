@@ -1,9 +1,14 @@
 /**
- * 题库 API 模拟层
- * 题库数据直接嵌入，避免 file:// 协议的跨域问题
+ * 题库 API 层
+ *
+ * 题库优先从 data/questions.json 运行时加载（改题目只需改 JSON）；
+ * 若通过 file:// 直接双击打开页面，fetch 会被浏览器拦截，
+ * 此时自动回退到文件末尾内置的题库副本，功能不受影响。
  */
 
-// 嵌入式题库数据
+const QUIZ_DATA_URL = 'data/questions.json';
+
+// 内置题库（data/questions.json 的副本，仅作为离线回退）
 const QUIZ_DATA = {
   "title": "第十届法治合规暨廉洁文化知识竞赛题库",
   "company": "航空工业复材",
@@ -360,27 +365,51 @@ class QuestionsAPI {
     this.metadata = {};
   }
 
-  // 加载题库数据（直接使用嵌入数据）
-  async loadQuestions() {
-    if (this.loaded) {
+  // 加载题库数据：先尝试 data/questions.json，失败则用内置副本
+  async loadQuestions(force = false) {
+    if (this.loaded && !force) {
       return this.questions;
     }
 
+    let data = null;
+    let source = '内置题库（离线回退）';
+
     try {
-      // 直接使用嵌入的数据，不需要 fetch
-      this.questions = QUIZ_DATA.questions;
-      this.metadata = {
-        title: QUIZ_DATA.title,
-        company: QUIZ_DATA.company,
-        totalQuestions: QUIZ_DATA.totalQuestions
-      };
-      this.loaded = true;
-      console.log('✅ 题库加载成功:', this.questions.length, '道题');
-      return this.questions;
+      const res = await fetch(QUIZ_DATA_URL, { cache: 'no-cache' });
+      if (res.ok) {
+        const parsed = await res.json();
+        if (this.isValidData(parsed)) {
+          data = parsed;
+          source = QUIZ_DATA_URL;
+        } else {
+          console.warn(`⚠️ ${QUIZ_DATA_URL} 结构不合法（缺少 questions 数组），改用内置题库`);
+        }
+      } else {
+        console.warn(`⚠️ 读取 ${QUIZ_DATA_URL} 失败（HTTP ${res.status}），改用内置题库`);
+      }
     } catch (error) {
-      console.error('❌ 加载题库失败:', error);
-      throw error;
+      console.warn(`⚠️ 无法读取 ${QUIZ_DATA_URL}（${error.message}），改用内置题库`);
     }
+
+    if (!data) {
+      data = QUIZ_DATA;
+    }
+
+    this.questions = data.questions;
+    this.metadata = {
+      title: data.title,
+      company: data.company,
+      generatedAt: data.generatedAt,
+      totalQuestions: this.questions.length,
+      source
+    };
+    this.loaded = true;
+    console.log(`✅ 题库加载成功: ${this.questions.length} 道题（来源：${source}）`);
+    return this.questions;
+  }
+
+  isValidData(data) {
+    return !!data && Array.isArray(data.questions) && data.questions.length > 0;
   }
 
   // 获取所有题目
@@ -428,36 +457,102 @@ class QuestionsAPI {
       return { correct: false, error: '题目不存在' };
     }
 
-    const isCorrect = this.checkAnswer(question.answer, userAnswer);
-    return {
+    const isCorrect = this.checkAnswer(question.answer, userAnswer, question.type);
+    const result = {
       correct: isCorrect,
       correctAnswer: question.answer,
-      analysis: question.analysis
+      analysis: question.analysis,
+      type: question.type
     };
+
+    // 简答题：把要点命中情况补充到解析里，方便用户知道差在哪
+    if (question.type === 'short') {
+      const detail = this.matchShortAnswer(question.answer, userAnswer);
+      const hit = `命中要点 ${detail.matched.length}/${detail.total}`;
+      const miss = detail.missing.length ? `，遗漏：${detail.missing.join('、')}` : '';
+      result.analysis = `${hit}${miss}。${question.analysis || ''}`;
+    }
+
+    return result;
   }
 
-  // 检查答案是否正确
-  checkAnswer(correctAnswer, userAnswer) {
-    if (!correctAnswer || !userAnswer) return false;
-    
-    // 标准化答案（去除空格，转大写）
-    const normalizedCorrect = correctAnswer.toUpperCase().replace(/\s/g, '');
-    const normalizedUser = userAnswer.toUpperCase().replace(/\s/g, '');
-    
-    // 判断题特殊处理
-    if (correctAnswer === 'true' || correctAnswer === 'false') {
-      return normalizedCorrect === normalizedUser;
+  /**
+   * 检查答案是否正确
+   * @param {string} correctAnswer 标准答案
+   * @param {string} userAnswer    用户答案
+   * @param {string} type          题型（multiple/short 需要特殊规则）
+   *
+   * 修正了旧逻辑按「答案字符串长度」猜测题型的 bug：
+   * 旧代码把长度 2~4 的填空题当成多选题排序比较，
+   * 导致「长治久安」输入乱序的「安久治长」也被判对。
+   */
+  checkAnswer(correctAnswer, userAnswer, type) {
+    if (correctAnswer === undefined || correctAnswer === null) return false;
+    if (userAnswer === undefined || userAnswer === null) return false;
+
+    const correct = String(correctAnswer).trim();
+    const user = String(userAnswer).trim();
+    if (!correct || !user) return false;
+
+    // 判断题
+    if (correct === 'true' || correct === 'false') {
+      return this.normalizeText(user) === this.normalizeText(correct);
     }
-    
-    // 多选题：排序后比较
-    if (correctAnswer.length > 1 && correctAnswer.length <= 4) {
-      const sortedCorrect = normalizedCorrect.split('').sort().join('');
-      const sortedUser = normalizedUser.split('').sort().join('');
-      return sortedCorrect === sortedUser;
+
+    // 多选题：与选项顺序无关
+    if (type === 'multiple') {
+      const norm = value => this.normalizeText(value).split('').sort().join('');
+      return norm(correct) === norm(user);
     }
-    
-    // 单选题和填空题
-    return normalizedCorrect === normalizedUser;
+
+    // 简答题：按要点命中率判分
+    if (type === 'short') {
+      return this.matchShortAnswer(correct, user).passed;
+    }
+
+    // 单选题 / 填空题：忽略大小写、空白以及中英文标点差异
+    return this.normalizeText(correct) === this.normalizeText(user);
+  }
+
+  // 去掉所有空白与标点后再比较（「主体；监督」等价于「主体;监督」「主体 监督」）
+  normalizeText(text) {
+    return String(text).replace(/[^\p{L}\p{N}]/gu, '').toUpperCase();
+  }
+
+  /**
+   * 简答题判分：把标准答案按「、；，」等拆成要点，
+   * 命中比例达到 passRatio 即算正确。
+   * 旧逻辑用全等字符串比较，用户把「、」写成「,」就判错，实际上等于答不对。
+   */
+  matchShortAnswer(correctAnswer, userAnswer, passRatio = 0.6) {
+    const segments = String(correctAnswer)
+      .split(/[、，,；;。.！!？?\s]+/)
+      .map(s => this.normalizeText(s))
+      .filter(Boolean);
+    const user = this.normalizeText(userAnswer);
+
+    if (!segments.length) {
+      const same = this.normalizeText(correctAnswer) === user;
+      return { passed: same, ratio: same ? 1 : 0, matched: [], missing: [], total: 0 };
+    }
+
+    const matched = [];
+    const missing = [];
+    segments.forEach(seg => (user.includes(seg) ? matched : missing).push(seg));
+
+    const ratio = matched.length / segments.length;
+    return { passed: ratio >= passRatio, ratio, matched, missing, total: segments.length };
+  }
+
+  // 各题型分值（app.js 的计分与满分都以此为准）
+  getScoreWeight(type) {
+    return ({ single: 2, multiple: 3, truefalse: 1, fill: 2, short: 5 })[type] || 1;
+  }
+
+  // 一组题目的满分
+  getMaxScore(questions) {
+    const list = questions || this.questions;
+    return list.reduce((sum, q) => sum + this.getScoreWeight(q.type), 0);
   }
 
   // 获取题型名称
