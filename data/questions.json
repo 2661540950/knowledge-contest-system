@@ -1,0 +1,7 @@
+﻿{
+  "title": "第十届法治合规暨廉洁文化知识竞赛题库",
+  "company": "航空工业复材",
+  "questions": [
+    {"id": 1, "type": "single", "question": "题目 1", "options": {"A": "选项 A", "B": "选项 B", "C": "选项 C", "D": "选项 D"}, "answer": "A"}
+  ]
+}

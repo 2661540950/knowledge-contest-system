@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>法治合规暨廉洁文化知识竞赛</title>
+    <link rel="stylesheet" href="src/styles.css">
+</head>
+<body>
+    <div id="app">
+        <!-- 头部 -->
+        <header>
+            <div class="header-content">
+                <h1>🏛️ 第十届法治合规暨廉洁文化知识竞赛</h1>
+                <p class="subtitle">航空工业复材</p>
+            </div>
+            <!-- 主页按钮 -->
+            <button id="homeBtn" class="home-btn" title="回到主页" style="display: none;">🏠 主页</button>
+        </header>
+
+        <!-- 主内容区 -->
+        <main>
+            <!-- 开始界面 -->
+            <section id="startScreen" class="screen active">
+                <div class="welcome-card">
+                    <div class="icon-large">⚖️</div>
+                    <h2>欢迎参加知识竞赛</h2>
+                    <p class="description">本竞赛包含单选题、多选题、判断题、填空题和简答题，旨在测试您对法治合规和廉洁文化知识的掌握程度。</p>
+                    
+                    <div class="stats-grid" id="quizStats">
+                        <div class="stat-item">
+                            <span class="stat-number" id="totalQuestions">-</span>
+                            <span class="stat-label">总题数</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="singleCount">-</span>
+                            <span class="stat-label">单选题</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="multipleCount">-</span>
+                            <span class="stat-label">多选题</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="wrongCount">-</span>
+                            <span class="stat-label">错题本</span>
+                        </div>
+                    </div>
+
+                    <div class="mode-selection">
+                        <h3>选择答题模式</h3>
+                        <div class="mode-cards">
+                            <div class="mode-card" data-mode="practice">
+                                <div class="mode-icon">📚</div>
+                                <h4>练习模式</h4>
+                                <p>逐题作答，立即显示答案和解析</p>
+                            </div>
+                            <div class="mode-card" data-mode="exam">
+                                <div class="mode-icon">📝</div>
+                                <h4>考试模式</h4>
+                                <p>限时答题，交卷后统一显示成绩</p>
+                            </div>
+                            <div class="mode-card" data-mode="random">
+                                <div class="mode-icon">🎲</div>
+                                <h4>随机测试</h4>
+                                <p>随机抽取 20 题进行快速测试</p>
+                            </div>
+                            <div class="mode-card" data-mode="wrong">
+                                <div class="mode-icon">📕</div>
+                                <h4>错题本模式</h4>
+                                <p>专门练习做错的题目和跳过的题目</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="startBtn" class="btn-primary" disabled>
+                        开始答题
+                    </button>
+                </div>
+            </section>
+
+            <!-- 答题界面 -->
+            <section id="quizScreen" class="screen">
+                <div class="quiz-header">
+                    <div class="progress-info">
+                        <span id="questionProgress">第 1 / 10 题</span>
+                        <span id="scoreDisplay">得分：0</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div id="progressBar" class="progress-fill"></div>
+                    </div>
+                </div>
+
+                <div class="question-card">
+                    <div class="question-type" id="questionType">单选题</div>
+                    <h3 class="question-text" id="questionText"></h3>
+                    
+                    <div class="options-container" id="optionsContainer">
+                        <!-- 选项动态生成 -->
+                    </div>
+
+                    <div class="answer-input" id="answerInput" style="display: none;">
+                        <input type="text" id="fillAnswer" placeholder="请输入答案" class="input-field">
+                    </div>
+
+                    <div class="feedback" id="feedback" style="display: none;">
+                        <div class="feedback-icon" id="feedbackIcon"></div>
+                        <div class="feedback-text">
+                            <strong id="feedbackTitle"></strong>
+                            <p id="feedbackAnalysis"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quiz-controls">
+                    <button id="submitBtn" class="btn-primary">提交答案</button>
+                    <button id="skipBtn" class="btn-secondary">跳过</button>
+                    <button id="nextBtn" class="btn-secondary" style="display: none;">下一题</button>
+                    <button id="addToWrongBtn" class="btn-warning" style="display: none;">加入错题本</button>
+                </div>
+            </section>
+
+            <!-- 结果界面 -->
+            <section id="resultScreen" class="screen">
+                <div class="result-card">
+                    <div class="result-icon" id="resultIcon">🏆</div>
+                    <h2 id="resultTitle">考试完成！</h2>
+                    
+                    <div class="score-display">
+                        <div class="score-circle">
+                            <span id="finalScore">0</span>
+                            <span class="score-label">分</span>
+                        </div>
+                    </div>
+
+                    <div class="result-stats">
+                        <div class="result-item">
+                            <span class="result-label">总题数</span>
+                            <span class="result-value" id="resultTotal">0</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">正确</span>
+                            <span class="result-value correct" id="resultCorrect">0</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">错误</span>
+                            <span class="result-value wrong" id="resultWrong">0</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">正确率</span>
+                            <span class="result-value" id="resultAccuracy">0%</span>
+                        </div>
+                    </div>
+
+                    <div class="result-actions">
+                        <button id="reviewBtn" class="btn-secondary">查看解析</button>
+                        <button id="restartBtn" class="btn-primary">重新答题</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 解析界面 -->
+            <section id="reviewScreen" class="screen">
+                <div class="review-header">
+                    <h2>📖 答案解析</h2>
+                    <button id="backToResultBtn" class="btn-small">返回结果</button>
+                </div>
+                <div id="reviewList" class="review-list">
+                    <!-- 解析列表动态生成 -->
+                </div>
+            </section>
+
+            <!-- 错题本界面 -->
+            <section id="wrongBookScreen" class="screen">
+                <div class="wrong-book-header">
+                    <h2>📕 错题本</h2>
+                    <div class="wrong-book-actions">
+                        <button id="clearWrongBookBtn" class="btn-small btn-danger">清空错题本</button>
+                        <button id="backToHomeFromWrongBtn" class="btn-small">返回主页</button>
+                    </div>
+                </div>
+                <div class="wrong-book-stats">
+                    <span>共有 <strong id="wrongBookCount">0</strong> 道题目</span>
+                </div>
+                <div id="wrongBookList" class="wrong-book-list">
+                    <!-- 错题列表动态生成 -->
+                </div>
+                <div class="wrong-book-actions-bottom" style="display: none;">
+                    <button id="practiceWrongBtn" class="btn-primary">开始练习错题</button>
+                </div>
+            </section>
+        </main>
+
+        <!-- 页脚 -->
+        <footer>
+            <p>© 2026 法治合规知识竞赛系统 | 航空工业复材</p>
+        </footer>
+    </div>
+
+    <script src="api/questions-api.js"></script>
+    <script src="src/app.js"></script>
+</body>
+</html>
