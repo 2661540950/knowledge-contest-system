@@ -3,20 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>法治合规暨廉洁文化知识竞赛</title>
+    <title>法治合规知识竞赛练习</title>
     <link rel="stylesheet" href="src/styles.css">
 </head>
 <body>
     <div id="app">
-        <!-- 头部 -->
-        <header>
-            <div class="header-content">
-                <h1>🏛️ 第十届法治合规暨廉洁文化知识竞赛</h1>
-                <p class="subtitle">航空工业复材</p>
+        <!-- 顶部进度条：只在答题 / 背题时显示，sticky 贴在窗口最上方 -->
+        <div id="topBar" class="top-bar" style="display: none;">
+            <div class="top-bar-row">
+                <span id="questionProgress" class="top-bar-text">第 — / — 题</span>
+                <span id="scoreDisplay" class="top-bar-text">得分：0 / —</span>
+                <button id="homeBtn" class="home-btn" title="回到主页">🏠 主页</button>
             </div>
-            <!-- 主页按钮 -->
-            <button id="homeBtn" class="home-btn" title="回到主页" style="display: none;">🏠 主页</button>
-        </header>
+            <div class="progress-bar">
+                <div id="progressBar" class="progress-fill"></div>
+            </div>
+        </div>
 
         <!-- 主内容区 -->
         <main>
@@ -25,8 +27,8 @@
                 <div class="welcome-card">
                     <div class="icon-large">⚖️</div>
                     <h2>欢迎参加知识竞赛</h2>
-                    <p class="description">本竞赛包含单选题、多选题、判断题、填空题和简答题，旨在测试您对法治合规和廉洁文化知识的掌握程度。</p>
-                    
+                    <p class="description">本题库包含单选题、多选题、判断题、填空题和简答题，旨在帮助您掌握法治合规和廉洁文化知识。</p>
+
                     <div class="stats-grid" id="quizStats">
                         <div class="stat-item">
                             <span class="stat-number" id="totalQuestions">-</span>
@@ -67,10 +69,10 @@
                                 <h4>考试模式</h4>
                                 <p>逐题作答并实时判分，答完统一查看成绩</p>
                             </div>
-                            <div class="mode-card" data-mode="random">
-                                <div class="mode-icon">🎲</div>
-                                <h4>随机测试</h4>
-                                <p>随机抽取 20 题进行快速测试</p>
+                            <div class="mode-card" data-mode="study">
+                                <div class="mode-icon">🧠</div>
+                                <h4>背题模式</h4>
+                                <p>直接给出答案和解析，用上一题 / 下一题逐题记忆</p>
                             </div>
                             <div class="mode-card" data-mode="wrong">
                                 <div class="mode-icon">📕</div>
@@ -80,7 +82,9 @@
                         </div>
                     </div>
 
-                    <p class="flow-hint">答题规则：单选题 / 判断题点选即判分，答对后 1 秒自动进入下一题；答错或跳过后需手动点「下一题」。</p>
+                    <p class="resume-hint" id="resumeHint" style="display: none;"></p>
+
+                    <p class="flow-hint">答题规则：单选题 / 判断题点选即判分，答对后 1 秒自动进入下一题；答错或跳过后需手动点「下一题」。练习 / 考试模式会记住进度，中途退出后可继续。</p>
 
                     <button id="startBtn" class="btn-primary" disabled>
                         开始答题
@@ -90,20 +94,10 @@
 
             <!-- 答题界面 -->
             <section id="quizScreen" class="screen">
-                <div class="quiz-header">
-                    <div class="progress-info">
-                        <span id="questionProgress">第 — / — 题</span>
-                        <span id="scoreDisplay">得分：0 / —</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div id="progressBar" class="progress-fill"></div>
-                    </div>
-                </div>
-
                 <div class="question-card">
                     <div class="question-type" id="questionType">单选题</div>
                     <h3 class="question-text" id="questionText"></h3>
-                    
+
                     <div class="options-container" id="optionsContainer">
                         <!-- 选项动态生成 -->
                     </div>
@@ -122,6 +116,7 @@
                 </div>
 
                 <div class="quiz-controls">
+                    <button id="prevBtn" class="btn-secondary" style="display: none;">上一题</button>
                     <button id="submitBtn" class="btn-primary">提交答案</button>
                     <button id="skipBtn" class="btn-secondary">跳过</button>
                     <button id="nextBtn" class="btn-secondary" style="display: none;">下一题</button>
@@ -134,7 +129,7 @@
                 <div class="result-card">
                     <div class="result-icon" id="resultIcon">🏆</div>
                     <h2 id="resultTitle">考试完成！</h2>
-                    
+
                     <div class="score-display">
                         <div class="score-circle">
                             <span id="finalScore">0</span>
@@ -203,7 +198,7 @@
 
         <!-- 页脚 -->
         <footer>
-            <p>© 2026 法治合规知识竞赛系统 | 航空工业复材</p>
+            <p>© 2026 法治合规知识竞赛练习 | Designed by DSH&amp;266</p>
         </footer>
     </div>
 
