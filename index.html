@@ -8,7 +8,8 @@
 </head>
 <body>
     <div id="app">
-        <!-- 顶部进度条：只在答题 / 背题时显示，sticky 贴在窗口最上方 -->
+        <!-- 顶部操作栏：只在答题 / 背题时显示，sticky 贴在窗口最上方。
+             进度、得分、所有作答按钮都放这里，题目长短不会让按钮乱跑 -->
         <div id="topBar" class="top-bar" style="display: none;">
             <div class="top-bar-row">
                 <span id="questionProgress" class="top-bar-text">第 — / — 题</span>
@@ -17,6 +18,13 @@
             </div>
             <div class="progress-bar">
                 <div id="progressBar" class="progress-fill"></div>
+            </div>
+            <div class="top-bar-actions">
+                <button id="prevBtn" class="btn-compact" style="display: none;">上一题</button>
+                <button id="submitBtn" class="btn-compact btn-compact-primary">提交答案</button>
+                <button id="skipBtn" class="btn-compact">跳过</button>
+                <button id="nextBtn" class="btn-compact" style="display: none;">下一题</button>
+                <button id="finishBtn" class="btn-compact btn-compact-primary" style="display: none;">交卷</button>
             </div>
         </div>
 
@@ -113,14 +121,6 @@
                             <p id="feedbackAnalysis"></p>
                         </div>
                     </div>
-                </div>
-
-                <div class="quiz-controls">
-                    <button id="prevBtn" class="btn-secondary" style="display: none;">上一题</button>
-                    <button id="submitBtn" class="btn-primary">提交答案</button>
-                    <button id="skipBtn" class="btn-secondary">跳过</button>
-                    <button id="nextBtn" class="btn-secondary" style="display: none;">下一题</button>
-                    <button id="finishBtn" class="btn-primary" style="display: none;">交卷</button>
                 </div>
             </section>
 
