@@ -78,8 +78,7 @@ class QuizApp {
             feedbackAnalysis: document.getElementById('feedbackAnalysis'),
             reviewList: document.getElementById('reviewList'),
             wrongBookList: document.getElementById('wrongBookList'),
-            wrongBookCount: document.getElementById('wrongBookCount'),
-            resumeHint: document.getElementById('resumeHint')
+            wrongBookCount: document.getElementById('wrongBookCount')
         };
     }
 
@@ -90,7 +89,6 @@ class QuizApp {
             await this.loadQuizData();
             this.setupEventListeners();
             this.updateStats();
-            this.updateResumeHint();
         } catch (e) {
             console.error('❌ 初始化失败:', e);
         }
@@ -169,6 +167,16 @@ class QuizApp {
         }
     }
 
+    // Fisher-Yates 洗牌：考试模式打乱出题顺序，不改动原数组
+    shuffle(list) {
+        const copy = [...list];
+        for (let i = copy.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [copy[i], copy[j]] = [copy[j], copy[i]];
+        }
+        return copy;
+    }
+
     // ---------- 进度记忆 ----------
 
     // 只有练习 / 考试模式记进度（背题是浏览，错题练习是临时集合）
@@ -190,7 +198,6 @@ class QuizApp {
         try {
             localStorage.setItem('quizProgress', JSON.stringify(payload));
         } catch (e) { /* 隐私模式 / 配额不足，忽略即可 */ }
-        this.updateResumeHint();
     }
 
     // 读回进度，并把题目 id 还原成题目对象（题库更新过也能对上）
@@ -223,20 +230,6 @@ class QuizApp {
         try {
             localStorage.removeItem('quizProgress');
         } catch (e) { /* 忽略 */ }
-        this.updateResumeHint();
-    }
-
-    updateResumeHint() {
-        const el = this.elements.resumeHint;
-        if (!el) return;
-        const saved = this.readProgress();
-        if (!saved || (saved.mode !== 'practice' && saved.mode !== 'exam')) {
-            el.style.display = 'none';
-            el.textContent = '';
-            return;
-        }
-        el.textContent = `📌 上次${this.modeName(saved.mode)}进度：第 ${saved.index + 1} / ${saved.questions.length} 题，得分 ${saved.score}（${this.formatTime(saved.savedAt)}）。选择同一模式开始时会询问是否继续。`;
-        el.style.display = 'block';
     }
 
     // ---------- 错题本 ----------
@@ -343,7 +336,6 @@ class QuizApp {
         document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('selected'));
         this.resetStartButton();
         this.updateWrongBookStats();
-        this.updateResumeHint();
     }
 
     // ---------- 开局 ----------
@@ -357,7 +349,7 @@ class QuizApp {
         }
         if (!this.allQuestions.length) return alert('题库为空');
 
-        // 背题模式：从头开始逐题浏览，不记进度
+        // 背题模式：按题库原顺序逐题浏览，不记进度
         if (this.isStudyMode) {
             return this.beginSession(this.allQuestions, { study: true });
         }
@@ -372,7 +364,9 @@ class QuizApp {
             this.clearProgress();
         }
 
-        this.beginSession(this.allQuestions, { remember: true });
+        // 考试模式的题目乱序出现；练习模式保持题库原顺序，方便按顺序刷
+        const pool = this.selectedMode === 'exam' ? this.shuffle(this.allQuestions) : this.allQuestions;
+        this.beginSession(pool, { remember: true });
     }
 
     practiceWrongQuestions() {

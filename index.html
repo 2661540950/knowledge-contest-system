@@ -33,9 +33,7 @@
             <!-- 开始界面 -->
             <section id="startScreen" class="screen active">
                 <div class="welcome-card">
-                    <div class="icon-large">⚖️</div>
-                    <h2>欢迎参加知识竞赛</h2>
-                    <p class="description">本题库包含单选题、多选题、判断题、填空题和简答题，旨在帮助您掌握法治合规和廉洁文化知识。</p>
+                    <h2>欢迎使用知识竞赛背题系统</h2>
 
                     <div class="stats-grid" id="quizStats">
                         <div class="stat-item">
@@ -75,7 +73,7 @@
                             <div class="mode-card" data-mode="exam">
                                 <div class="mode-icon">📝</div>
                                 <h4>考试模式</h4>
-                                <p>逐题作答并实时判分，答完统一查看成绩</p>
+                                <p>全部题目乱序出现，逐题作答并实时判分，答完统一查看成绩</p>
                             </div>
                             <div class="mode-card" data-mode="study">
                                 <div class="mode-icon">🧠</div>
@@ -90,13 +88,11 @@
                         </div>
                     </div>
 
-                    <p class="resume-hint" id="resumeHint" style="display: none;"></p>
-
-                    <p class="flow-hint">答题规则：单选题 / 判断题点选即判分，答对后 1 秒自动进入下一题；答错或跳过后需手动点「下一题」。练习 / 考试模式会记住进度，中途退出后可继续。</p>
-
                     <button id="startBtn" class="btn-primary" disabled>
                         开始答题
                     </button>
+
+                    <p class="cache-hint">💡 如果系统出现问题，请先清理浏览器缓存后重试（清缓存会同时清掉答题进度和错题本）。</p>
                 </div>
             </section>
 
@@ -198,7 +194,7 @@
 
         <!-- 页脚 -->
         <footer>
-            <p>© 2026 法治合规知识竞赛练习 | Designed by DSH&amp;266</p>
+            <p>© 2026 法治合规知识竞赛练习<br>Designed by DSH&amp;266</p>
         </footer>
     </div>
 

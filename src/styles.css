@@ -15,12 +15,13 @@ body {
 }
 
 #app {
-    max-width: 900px;
+    /* 放宽容器，让选项 / 输入框一行能装下更多字 */
+    max-width: 1120px;
     margin: 0 auto;
     background: white;
     border-radius: 15px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    /* 顶部进度条用 position: sticky 贴在窗口最上方，overflow: hidden 会让 sticky 失效 */
+    /* 顶部操作栏用 position: sticky 贴在窗口最上方，overflow: hidden 会让 sticky 失效 */
     overflow: visible;
     min-height: 80vh;
 }
@@ -84,22 +85,9 @@ body {
     background: #ffffff;
 }
 
-/* 上次进度提示 */
-.resume-hint {
-    margin: 20px 0 0;
-    padding: 12px 16px;
-    background: #fff8e1;
-    border-left: 4px solid #ffb300;
-    border-radius: 6px;
-    font-size: 0.9rem;
-    color: #6d4c00;
-    line-height: 1.7;
-    text-align: left;
-}
-
 /* 主内容区 */
 main {
-    padding: 30px 20px;
+    padding: 24px 18px;
     min-height: 60vh;
 }
 
@@ -123,27 +111,23 @@ main {
     padding: 20px;
 }
 
-.icon-large {
-    font-size: 5rem;
-    margin-bottom: 20px;
-    animation: bounce 2s infinite;
-}
-
-@keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-}
-
 .welcome-card h2 {
     color: #667eea;
     font-size: 1.8rem;
-    margin-bottom: 15px;
+    margin-bottom: 24px;
 }
 
-.description {
-    color: #666;
-    margin-bottom: 30px;
-    line-height: 1.8;
+/* 首页底部提示（清理缓存） */
+.cache-hint {
+    margin: 24px 0 0;
+    padding: 12px 16px;
+    background: #eef1fd;
+    border-left: 4px solid #667eea;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    color: #555;
+    line-height: 1.7;
+    text-align: left;
 }
 
 /* 统计网格 */
@@ -176,19 +160,6 @@ main {
 .stat-label {
     font-size: 0.9rem;
     color: #666;
-}
-
-/* 答题规则提示 */
-.flow-hint {
-    margin: 20px 0 0;
-    padding: 12px 16px;
-    background: #eef1fd;
-    border-left: 4px solid #667eea;
-    border-radius: 6px;
-    font-size: 0.9rem;
-    color: #555;
-    line-height: 1.7;
-    text-align: left;
 }
 
 /* 模式选择 */
@@ -348,7 +319,7 @@ main {
 .question-card {
     background: #f8f9fa;
     border-radius: 10px;
-    padding: 30px;
+    padding: 22px;
     margin-bottom: 20px;
 }
 
@@ -378,7 +349,7 @@ main {
 .option-item {
     display: flex;
     align-items: flex-start;
-    padding: 15px 20px;
+    padding: 13px 16px;
     background: white;
     border: 2px solid #e0e0e0;
     border-radius: 8px;
@@ -824,6 +795,23 @@ footer {
 
     .question-text {
         font-size: 1.1rem;
+    }
+
+    /* 手机上把内边距再收紧，尽量多放字 */
+    main {
+        padding: 16px 12px;
+    }
+
+    .question-card {
+        padding: 16px;
+    }
+
+    .option-item {
+        padding: 11px 12px;
+    }
+
+    .welcome-card {
+        padding: 12px;
     }
 
     .result-stats {
